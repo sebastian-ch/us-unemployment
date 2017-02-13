@@ -8,127 +8,17 @@
 
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.3/dist/leaflet.css" />
     <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
-
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: whitesmoke;
-            font-family: Lato, sans-serif;
-            color: #0D0000;
-        }
-        
-        header {
-            padding: 6px 10%;
-        }
-        
-        h1 {
-            position: absolute;
-            z-index: 650;
-            top: 10px;
-            left: 15px;
-            padding: 8px 15px;
-            margin: 0;
-            color: whitesmoke;
-            font-size: 1.5em;
-            background: rgba(25, 25, 25, 0.8);
-            border-radius: 5px;
-        }
-        
-        h2 {
-            display: inline-block;
-            color: #001323;
-        }
-        
-        #map {
-            position: absolute;
-            width: 100%;
-            top: 0;
-            bottom: 0;
-        }
-        
-        footer {
-            padding: 6px 10%;
-            width: 80%;
-        }
-        
-        p {
-            font-size: 1em;
-            color: #001323;
-        }
-        
-        .legend {
-            padding: 6px 8px;
-            font-family: Lato, sans-serif;
-            font-size: 1em;
-            background: rgba(75, 75, 75, 0.8);
-            color: whitesmoke;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-            width: 160px;
-        }
-        
-        .legend h3 {
-            font-size: 1.1em;
-            font-weight: bold;
-            line-height: 1em;
-            color: whitesmoke;
-            margin: 0;
-        }
-        
-        .legend h3 span {
-            font-size: 1.3em;
-            margin: 0 20px 0 0;
-        }
-        
-        .legend ul {
-            list-style-type: none;
-            padding: 0;
-            margin: 12px 4px 0;
-        }
-        
-        .legend li {
-            height: 22px;
-        }
-        
-        .legend span {
-            width: 30px;
-            height: 20px;
-            float: left;
-            margin-right: 10px;
-        }
-        
-        #ui-controls {
-            width: 176px;
-            padding: 8px 25px 8px 15px;
-            background: rgba(75, 75, 75, 0.8);
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
-            border-radius: 5px;
-            color: whitesmoke;
-            font-family: Lato, sans-serif;
-        }
-        
-        #ui-controls .min {
-            float: left;
-        }
-        
-        #ui-controls .max {
-            float: right;
-            margin-right: -15px;
-        }
-        
-        .year-slider {
-            width: 100%;
-        }
-        
-        label {
-            font-size: 1.1em;
-            font-weight: bold;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css" />
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.2.1/chroma.min.js"></script>
+    
 </head>
 
 <body>
+    
     <h1>US Unemployment Rates: 2001 &ndash; 2015</h1>
     <div id="map"></div>
     <div id="ui-controls">
@@ -137,13 +27,8 @@
         </label>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-    <script src="https://unpkg.com/leaflet@1.0.3/dist/leaflet.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/4.1.2/papaparse.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.2.1/chroma.min.js"></script>
-
     <script>
-        // map options
+        //map options
         //set the zoom and center here instead
         //of using setZoom and fitBounds due to Alaska and HI being far away;
         //figured most of the users/viewers of the map would prefer a start on
@@ -240,7 +125,6 @@
 
         function drawMap(counties, colorize) {
 
-            // create Leaflet object with geometry data and add to map
             var dataLayer = L.geoJson(counties, {
                 style: function (feature) {
                     return {
@@ -253,19 +137,17 @@
             }).addTo(map);
 
             dataLayer.eachLayer(function (layer) {
-                //highlight on hover
+                
                 layer.on('mouseover', function () {
                     this.setStyle({
                         color: 'yellow',
                         weight: 2
 
                     });
-                    //brings the layer to the front! So the highlight will
-                    //be visible
+                    
                     this.bringToFront();
                 });
 
-                //back to black on mouseout
                 layer.on('mouseout', function () {
                     this.setStyle({
                         color: 'black',
@@ -274,9 +156,7 @@
                 });
             });
 
-            //call updateMap - initial value at 2001
             updateMap(dataLayer, colorize, '2001');
-            //call createSliderUI when the map is drawn
             createSliderUI(dataLayer, colorize);
 
         }
@@ -308,9 +188,7 @@
                 layer.on('click', function () {
                     this.bindPopup(popupInfo).openPopup();
                 });
-
             });
-
         }
 
         function drawLegend(breaks, colorize) {
@@ -350,7 +228,7 @@
             });
 
             sliderControl.onAdd = function (map) {
-                //select the div 'ui-controls' from our  html
+                
                 var slider = L.DomUtil.get("ui-controls");
                 L.DomEvent.disableScrollPropagation(slider);
                 L.DomEvent.disableClickPropagation(slider);
@@ -360,10 +238,6 @@
 
             sliderControl.addTo(map);
 
-            //listens for slider change.
-            //when it does change, update the currentYear variable
-            //and call updateMap with it. Also update legend header with
-            //the correct year
             $(".year-slider")
                 .on("input change", function () {
                     var currentYear = $(this).val();
